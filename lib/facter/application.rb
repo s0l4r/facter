@@ -64,6 +64,19 @@ module Facter
         end
       end
 
+      # Print the facts as XML and exit
+      if options[:xml]
+        begin
+          require 'rubygems'
+          require 'xmlsimple'
+          puts XmlSimple.xml_out(facts)
+          exit(0)
+        rescue LoadError
+          $stderr.puts "You do not have XML support in your version of Ruby. XML output disabled"
+          exit(1)
+        end
+      end
+
       # Print the value of a single fact, otherwise print a list sorted by fact
       # name and separated by "=>"
       if facts.length == 1
@@ -91,6 +104,7 @@ module Facter
       options = {}
       OptionParser.new do |opts|
         opts.on("-y", "--yaml")   { |v| options[:yaml]   = v }
+        opts.on("-x", "--xml")   { |v| options[:xml]   = v }
         opts.on("-j", "--json")   { |v| options[:json]   = v }
         opts.on(      "--trace")  { |v| options[:trace]  = v }
         opts.on(      "--external-dir DIR") { |v| create_directory_loader(v) }
